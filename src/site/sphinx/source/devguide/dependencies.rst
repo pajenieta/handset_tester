@@ -17,7 +17,7 @@ install:
     - **A 32-bit version of eclipse** - We've been developing with Eclipse IDE for
       Java Developers Indigo (v 3.7.1).
     - **Apache Ant (version 1.8.X is fine)**
-    - **`Antenna 1.2.1-beta for Ant <http://antenna.sourceforge.net/>`_**. Download
+    - `Antenna 1.2.1-beta for Ant <http://antenna.sourceforge.net/>`_. Download
       the binary jar version and either copy or symlink this in your apache lib
       directory or modify your custom user.properties file to point to the location
       of your antenna jar.
