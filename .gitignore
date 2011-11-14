@@ -1,6 +1,10 @@
 target/
 *.swp
 
+### This is a custom properties file that developers can make
+# to configure environment-specific settings
+src/build/user.properties
+
 # Documentation
 src/site/sphinx/build/
 
