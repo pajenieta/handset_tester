@@ -1,0 +1,129 @@
+<?xml version="1.0"?>
+<project name="handset_tester" default="package" basedir=".">
+
+  <!--
+    TODO: put this in a README file
+
+    try both to see which plays better on your jdk: 
+
+    If we are using a non-reparenting window manager (see:
+    http://en.wikipedia.org/wiki/Re-parenting_window_manager and
+    http://awesome.naquadah.org/wiki/Problems_with_Java)
+
+    Then do this::
+
+      wmname LG3D     ### wmname is in the suckless-tools package in debian. Otherwise get it from http://suckless.org/
+
+    Depending on your JDK, you may need to set the AWT_TOOLKIT environment variable to one of::
+
+        export AWT_TOOLKIT=MToolkit
+        export AWT_TOOLKIT=XToolkit
+
+    However, the AWT_TOOLKIT change should be unnecessary with a late 1.5.x or 1.6.x jdk.
+
+  -->
+  <property environment="env"/>
+  <property name="build.config.dir" value='src/build'/>
+
+  <condition property='user.properties.location' 
+            value='${env.HANDSET_TESTER_USER_PROPERTIES_FILE}' 
+            else='${build.config.dir}/user.properties'>
+    <isset property='env.HANDSET_TESTER_USER_PROPERTIES_FILE'/>
+  </condition>
+
+  <property file="${user.properties.location}"/>
+  <property file="${build.config.dir}/project.properties"/>
+
+  <path id="antenna.jar.path">
+    <fileset file="${antenna.jar}"/>
+  </path>
+
+  <taskdef resource="antenna.properties" classpathref="antenna.jar.path"/>
+
+  <!-- ======= -->
+  <!-- Targets -->
+  <!-- ======= -->
+  <target name='package' depends='initialize, jad, compile, jar' description='Build the project'/>
+  <target name='run' depends='package, preverify, run-midlet' description='Run the App'/>
+
+  <target name="jad">
+    <!--
+      NOTE: The wtkjad task can update jad file metadata from the listed
+            attributes or from the jar (jar file size). We can run it independently
+            to update the jad file with attributes without recompiling.
+    -->
+    <wtkjad jadfile="${jadfile}"
+            jarfile="${jarfile}"
+            name="${project.artifactId}"
+            vendor="${project.groupId}"
+            version="${project.version}">
+      <midlet name="${project.artifactId}" class="${project.mainClass}"/>
+      <attribute name="FOO" value="BAR" /> <!-- placeholder... update later when I actually have attribs -->
+    </wtkjad>
+  </target>
+
+  <target name='jar' description='package contents into a jar'>
+    <wtkpackage basedir="${project.build.outputDirectory}"
+                jadfile="${jadfile}"
+                jarfile="${jarfile}"
+                obfuscate="false"
+                preverify="false">
+    </wtkpackage>
+  </target>
+
+  <target name='preverify'>
+    <wtkpreverify jarfile="${jarfile}" jadfile="${jadfile}"/>
+  </target>
+
+  <target name='run-midlet'>
+    <wtkrun jadfile="${jadfile}" device="DefaultColorPhone" wait="${wtk.run.wait}"/>
+  </target>
+
+  <target name='compile' description='compile java sources'>
+    <wtkbuild srcdir="${project.build.sourceDirectory}"
+              destdir="${project.build.outputDirectory}"
+              preverify="false"/>
+  </target>
+
+  <target name='clean' description='delete the target directory, including compiled class, jar and jad files'>
+    <delete dir="${project.build.directory}"/>
+  </target>
+
+  <target name='initialize' description='initialize target directories'>
+    <mkdir dir="${project.build.outputDirectory}"/>
+  </target>
+
+  <!-- For *nix only -->
+  <target name='fix_wm_name' 
+    description='If you run a non-reparenting window manager with x11/xorg, run this target once per xorg session to fix irregular emulator GUI behavior'>
+    <exec executable="wmname">
+      <arg value="LG3D"/>
+    </exec>
+  </target>
+
+  <!-- 
+    Generate an eclipse project.  This will clobber your existing eclipse project. 
+    So do not do this more than once if you have customized your eclipse project.
+  -->
+  <target name='eclipse:eclipse'>
+    <concat destfile=".classpath">
+      <fileset file="src/ant/eclipse_classpath_template.xml"/>
+      <filterchain><expandproperties/></filterchain>
+    </concat>
+    <concat destfile=".project">
+      <fileset file="src/ant/eclipse_project_template.xml"/>
+      <filterchain><expandproperties/></filterchain>
+    </concat>
+  </target>
+
+  <!-- WARNING: do not run this once you have set up your eclipse project. Debugging only. -->
+  <target name='eclipse:clean'>
+    <delete file=".classpath"/>
+    <delete file=".project"/>
+  </target>
+
+  <target name='props' description='print all build properties. This is just for debugging the build.'>
+    <echoproperties/>
+  </target>
+
+</project>
