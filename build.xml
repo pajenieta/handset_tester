@@ -1,27 +1,6 @@
 <?xml version="1.0"?>
 <project name="handset_tester" default="package" basedir=".">
 
-  <!--
-    TODO: put this in a README file
-
-    try both to see which plays better on your jdk: 
-
-    If we are using a non-reparenting window manager (see:
-    http://en.wikipedia.org/wiki/Re-parenting_window_manager and
-    http://awesome.naquadah.org/wiki/Problems_with_Java)
-
-    Then do this::
-
-      wmname LG3D     ### wmname is in the suckless-tools package in debian. Otherwise get it from http://suckless.org/
-
-    Depending on your JDK, you may need to set the AWT_TOOLKIT environment variable to one of::
-
-        export AWT_TOOLKIT=MToolkit
-        export AWT_TOOLKIT=XToolkit
-
-    However, the AWT_TOOLKIT change should be unnecessary with a late 1.5.x or 1.6.x jdk.
-
-  -->
   <property environment="env"/>
   <property name="build.config.dir" value='src/build'/>
 

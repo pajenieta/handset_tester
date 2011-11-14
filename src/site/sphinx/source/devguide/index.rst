@@ -9,4 +9,5 @@
     :maxdepth: 2
 
     dependencies
+    ant_build
     eclipse-setup
