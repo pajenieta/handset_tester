@@ -5,6 +5,11 @@
   <property name="build.config.dir" value='src/build'/>
   <typedef file="${build.config.dir}/j2me.antlib.xml"/>
 
+  <!-- nokia fix: the nokias40 emulator does not seem to properly accept device strings. -->
+  <condition property='device' value=''>
+    <equals arg1='${emulator}' arg2='nokias40' casesensitive='false' trim='true'/>
+  </condition>
+
   <condition property='user.properties.location' 
             value='${env.HANDSET_TESTER_USER_PROPERTIES_FILE}' 
             else='${build.config.dir}/user.properties'>
@@ -28,10 +33,11 @@
   <condition property='wtk.home' value='${wtk.home.samsung}'>
     <equals arg1='${emulator}' arg2='samsung' casesensitive='false' trim='true'/>
   </condition>
-  <condition property='wtk.home' value='${wtk.home.nokia}'>
-    <equals arg1='${emulator}' arg2='nokia' casesensitive='false' trim='true'/>
+  <condition property='wtk.home' value='${wtk.home.nokias40}'>
+    <equals arg1='${emulator}' arg2='nokias40' casesensitive='false' trim='true'/>
   </condition>
   <property name='wtk.home' value='${wtk.home.sun}'/>
+
 
   <!-- ======= -->
   <!-- Targets -->
@@ -69,7 +75,7 @@
   </target>
 
   <target name='run-midlet'>
-    <wtkrun jadfile="${jadfile}" device="${device}" wait="${wtk.run.wait}"/>
+    <wtkrun jadfile="${jadfile}" device='${device}' wait="${wtk.run.wait}"/>
   </target>
 
   <target name='compile' description='compile java sources'>
