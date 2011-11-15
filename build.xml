@@ -3,6 +3,7 @@
 
   <property environment="env"/>
   <property name="build.config.dir" value='src/build'/>
+  <typedef file="${build.config.dir}/j2me.antlib.xml"/>
 
   <condition property='user.properties.location' 
             value='${env.HANDSET_TESTER_USER_PROPERTIES_FILE}' 
@@ -18,6 +19,19 @@
   </path>
 
   <taskdef resource="antenna.properties" classpathref="antenna.jar.path"/>
+
+
+  <!--
+    Set the ${wtk.home} property based on the value of the ${emulator}
+    property, and default it to ${wtk.home.sun} if emulator is undefined.
+  -->
+  <condition property='wtk.home' value='${wtk.home.samsung}'>
+    <equals arg1='${emulator}' arg2='samsung' casesensitive='false' trim='true'/>
+  </condition>
+  <condition property='wtk.home' value='${wtk.home.nokia}'>
+    <equals arg1='${emulator}' arg2='nokia' casesensitive='false' trim='true'/>
+  </condition>
+  <property name='wtk.home' value='${wtk.home.sun}'/>
 
   <!-- ======= -->
   <!-- Targets -->
@@ -55,7 +69,7 @@
   </target>
 
   <target name='run-midlet'>
-    <wtkrun jadfile="${jadfile}" device="DefaultColorPhone" wait="${wtk.run.wait}"/>
+    <wtkrun jadfile="${jadfile}" device="${device}" wait="${wtk.run.wait}"/>
   </target>
 
   <target name='compile' description='compile java sources'>
@@ -103,6 +117,15 @@
 
   <target name='props' description='print all build properties. This is just for debugging the build.'>
     <echoproperties/>
+  </target>
+
+  <target name='list:emulators'
+    description='List all installed j2me emulators. For this to work, you must define a wtk.home.EMULATOR_NAME property'>
+    <listEmulators/>
+  </target>
+
+  <target name='list:devices' description='List all devices available for the active emulator.'>
+    <listDevices/>
   </target>
 
 </project>

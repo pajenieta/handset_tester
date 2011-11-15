@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<antlib>
+
+    <scriptdef name="listEmulators" language="javascript">
+      <![CDATA[
+        var System = Packages.java.lang.System;
+        var File = Packages.java.io.File;
+
+        function getEmulatorNames() {
+          var ret = [];
+          var prefix = 'wtk.home.';
+          var propTable = project.getProperties();
+          for(var e = propTable.keySet().iterator(); e.hasNext();) {
+            var k = e.next();
+            if(k.indexOf(prefix) == 0) {
+              ret.push( k.substr(prefix.length) );
+            }
+          }
+          return ret;
+        }
+
+        function isDir(file) { return new File(file).isDirectory(); }
+
+        function validateEmulatorPaths(emulators) {
+          var emulatorPath = '';
+          var emulatorName = '';
+          for(var i=0; i<emulators.length; i++) {
+            emulatorName = emulators[i];
+            emulatorPath = project.getProperty('wtk.home.' + emulatorName).trim();
+            if( emulatorPath.length == 0 ) {
+              System.out.println("ERROR: path not defined for wtk.home." + emulatorName);
+            } else if( !isDir(emulatorPath) ) {
+              System.out.println("ERROR: invalid path [" + emulatorPath + "] defined for property: wtk.home." + emulatorName);
+            }
+          }
+        }
+
+        var emulators = getEmulatorNames();
+        System.out.println("Emulators: ");
+        for(var i=0; i<emulators.length; i++) {
+          System.out.println("\t" + emulators[i]);
+        }
+
+        System.out.println();
+        validateEmulatorPaths(emulators);
+      ]]>
+    </scriptdef>
+
+    <scriptdef name="listDevices" language="javascript">
+      <![CDATA[
+        var System = Packages.java.lang.System;
+        var File = Packages.java.io.File;
+        var emulator = project.getProperty('emulator');
+        var errorsExist = false;
+
+        function logError(msg) { 
+          errorsExist=true; 
+          System.out.println("ERROR: " + msg); 
+        }
+
+        function getDeviceList(deviceDir) {
+          var ret=[];
+          var children = deviceDir.listFiles();
+          for(var i=0; i<children.length; i++) {
+            var child = children[i];
+            if(child.isDirectory() && new File(child, child.getName() + '.properties').isFile()) {
+              ret.push(child.getName());
+            }
+          }
+          ret.sort();
+          return ret;
+        }
+
+        var wtkHome = new File(project.getProperty('wtk.home'));
+        if( !wtkHome.isDirectory() ) {
+          logError("Property wtk.home does not point to a directory.");
+        }
+
+        var deviceDir = new File(wtkHome, "wtklib/devices");
+        if( !deviceDir.isDirectory() ) {
+          logError("No device directory found: " + deviceDir.getAbsolutePath());
+        }
+
+        if(!errorsExist) {
+          var devices = getDeviceList(deviceDir);
+          System.out.println("Devices for emulator ["+emulator+"]:");
+          for(var i=0; i<devices.length; i++) {
+            System.out.println("\t\t" + devices[i]);
+          }
+        }
+
+      ]]>
+    </scriptdef>
+
+
+</antlib>
