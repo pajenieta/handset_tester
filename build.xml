@@ -42,8 +42,8 @@
   <!-- ======= -->
   <!-- Targets -->
   <!-- ======= -->
-  <target name='package' depends='initialize, jad, compile, jar' description='Build the project'/>
-  <target name='run' depends='package, preverify, run-midlet' description='Run the App'/>
+  <target name='package' depends='initialize, jad, compile, jar, obfuscate, preverify' description='Build the project'/>
+  <target name='run' depends='package, run-midlet' description='Run the App'/>
 
   <target name="jad">
     <!--
@@ -68,6 +68,10 @@
                 obfuscate="false"
                 preverify="false">
     </wtkpackage>
+  </target>
+
+  <target name='obfuscate' description='obfuscate and minify the output jar with proguard'>
+    <wtkobfuscate jadfile="${jadfile}" jarfile="${jarfile}"/>
   </target>
 
   <target name='preverify'>
