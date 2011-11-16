@@ -1,4 +1,5 @@
 emulator=sun
 wtk.home.sun=${user.home}/opt/j2me/sun/WTK2.5.2
 wtk.home.samsung=
+wtk.home.nokias40=
 antenna.jar=${user.home}/opt/javalib/antenna/antenna-bin-1.2.1-beta.jar

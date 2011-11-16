@@ -9,5 +9,6 @@
     :maxdepth: 2
 
     dependencies
-    ant_build
+    emulator_installation
     eclipse-setup
+    ant_build

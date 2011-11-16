@@ -12,7 +12,7 @@ Before you can build with ant, you must configure a custom build properties
 file with environment-specific settings. The build is set up to look for 
 a properties files in a location defined in an environment variable named::
 
-      HANDSET_TESTER_USER_PROPERTIES_FILE
+    HANDSET_TESTER_USER_PROPERTIES_FILE
 
 If this environment variable is undefined, the build will look for custom
 properties in the file::
@@ -25,10 +25,19 @@ and take the value that is specified when they are first defined, you can
 override any project property configured in ``project.properties`` in your
 custom properties file.
 
-These properties must be defined in your custom user properties file:
-    - **wtk.home** :    this must be set to the path of your WTK installation
-      directory
-    - **antenna.jar** : this should be set to the path where you have the antenna
+There is a sample user.properties template file defined in::
+
+    src/build/user.properties.template
+
+You can copy this file and customize it to set the locations of your j2me
+emulators and other configuration settings.
+
+These properties should be defined in your custom user properties file:
+    - **wtk home properties**:
+        - ``wtk.home.sun``: the location where you installed the Sun/Oracle WTK
+        - ``wtk.home.samsung``: the location of your Samsung J2ME SDK
+        - ``wtk.home.nokias40``: the location of your Nokia S40 SDK
+    - ``antenna.jar`` : this should be set to the path where you have the antenna
       jar installed. This is optional if you copy or symlink the jar in your
       ant lib directory (or otherwise ensure that it is included in ant's
       runtime classpath)
@@ -43,18 +52,50 @@ in your build. This can be useful to troubleshoot a misconfiguration in the
 location of your environment-specific properties file.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Running the emulator
+Basic Emulator Execution
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To run the basic Sun/Oracle DefaultColorPhone device emulator, run::
+To build, package and run the MIDLet with the ``DefaultColorPhone`` device on
+the basic ``sun`` wtk emulator, execute:: 
 
     ant run
+
+To run the MIDLet without re-building, execute::
+
+    ant run-midlet
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Properties that control emulator behavior
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+=============== =====================================================
+Property        Description
+=============== =====================================================
+``emulator``    the emulator that will be used with the run target
+``device``      the name of the device that will be emulated
+=============== =====================================================
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Other Build Targets and Examples
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Print the names of installed emulators::
+
+    ant list:emulators
+
+List the devices available for, in this case, the ``samsung`` emulator::
+
+    ant -Demulator=samsung list:devices
+
+Run the MIDLet, emulating the ``SGH-E250`` device with the ``samsung`` emulator::
+
+    ant -Ddevice=SGH-E250 -Demulator=samsung run-midlet
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Notes on Running the Emulator in \*nix
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you are developing on linux or unix anr running the WTK emulator under xorg/xwindows
+If you are developing on linux or unix and running the WTK emulator under xorg/xwindows
 with a `non-reparenting window manager
 <http://en.wikipedia.org/wiki/Re-parenting_window_manager>`_ (this includes
 most tiling window managers like dwm, awesome, xmonad, etc as well as barebones
@@ -72,9 +113,86 @@ In this case, java is coded to know that ``LG3D`` is a non-reparenting WM, and
 it will adjust the behavior of mouse tracking. This should then work for any
 non-reparenting WM.
 
-If you still have erratic GUI behavior in your emulator, you can try to explicitly
-set the AWT_TOOLKIT that is used. Try one of these values::
+If you still have erratic GUI behavior in your emulator, you can try to
+explicitly set the AWT_TOOLKIT that is used. Try one of these values::
 
     export AWT_TOOLKIT=MToolkit
     export AWT_TOOLKIT=XToolkit
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Running the Emulator in a Windows XP VM in Linux
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The Sun/Oracle WTK is the only J2ME emulator that distributes an official linux
+build. While it may be possible to copy jar and configuration files from other
+emulator distributions and reconfigure them to run on top of the sun WTK, the
+only way to run other emulators with OOTB installation is to use windows.
+
+If you are developing on linux, you can set up a windows XP virtualmachine
+with kvm, qemu or virtualbox to run other emulators. It is possible to 
+mount your project source directory from your linux host as a SMB/CIFS
+network share in windows so you can run, *e.g.*, the samsung or nokias40
+emulator in windows against your linux project directory.
+
+In my setup, I use cygwin on windows to do this with the following
+configuration:
+
+    - configure your ~/.bashrc to include ``$HOME/bin`` on your path
+
+    - install a 1.6.X JDK in your windows XP VM
+
+    - install a 1.5.X JRE in your windows XP VM (for the nokias40 emulator)
+
+    - in ``Control Panel -> System -> Advanced -> Environment Variables``:
+        - define a ``JAVA_HOME`` environment variable to point to the windows
+          path of your 1.6 JDK (*e.g.*, ``C:\opt\java\jdk1.6.0_29``)
+        - add the ``bin`` directory of the jdk to the end of the windows
+          ``Path`` environment variable
+
+    - install apache ant, *e.g.*, to ``E:\opt\ant\apache-ant-1.8.2`` 
+
+    - create a symlink in cygwin from the ``ant`` POSIX shell script in the
+      ``$ANT_HOME/bin`` directory to your ``$HOME/bin``, *e.g.*,:
+
+        .. code-block:: bash
+
+            ln -s /cygdrive/e/opt/ant/apache-ant-1.8.2/bin/ant $HOME/bin/ant
+
+    - configure SAMBA in linux to export your MIDLet project directory as
+      a SMB/CIFS share. Example from smb.conf::
+
+            [handset_tester]
+                comment = handset_tester project
+                path =  /home/you/ws/handset_tester
+                browseable = yes
+                read only = no
+                create mask = 0700
+                directory mask = 0700
+                valid users = greg
+
+    - In windows, map the ``handset_tester`` share as a network drive (*e.g.*, ``W:\``)
+      so it is easy to access from cygwin as ``/cygdrive/w``
+
+    - Define a ``HANDSET_TESTER_USER_PROPERTIES_FILE`` environment variable in
+      your ``~/.bashrc`` to point to a custom ``handset_tester.properties`` file
+      in your cygwin home directory (the value should be a windows path expression), *e.g.*:
+
+        .. code-block:: bash
+
+            export HANDSET_TESTER_USER_PROPERTIES_FILE='E:/cygwin/home/you/ws/handset_tester.properties'
+
+Here is a sample ``handset_tester.properties``::
+
+    wtk.home.sun=E:/opt/j2me/wtk/WTK2.5.2_01
+    wtk.home.samsung=E:/opt/j2me/samsung/samsung_sdk-1.1
+    wtk.home.nokias40=E:/opt/j2me/nokia/S40_5th_Edition_SDK
+    antenna.jar=E:/opt/javalib/antenna/antenna-bin-1.2.1-beta.jar
+
+Now you should be able to navigate to ``/cygdrive/w`` and invoke a J2ME emulator with ant:
+
+.. code-block:: bash
+
+    cd /cygdrive/w
+    ant -Ddevice=SGH-E250 -Demulator=samsung run-midlet
+
 

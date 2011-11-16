@@ -22,5 +22,3 @@ install:
       directory or modify your custom user.properties file to point to the location
       of your antenna jar.
 
-
-TODO: document additional emulators (nokia and samsung)
