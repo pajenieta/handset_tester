@@ -42,7 +42,7 @@
   <!-- ======= -->
   <!-- Targets -->
   <!-- ======= -->
-  <target name='package' depends='initialize, jad, compile, jar, obfuscate, preverify' description='Build the project'/>
+  <target name='package' depends='initialize, jad, compile, jar, obfuscate, preverify, sign' description='Build the project'/>
   <target name='run' depends='package, run-midlet' description='Run the App'/>
 
   <target name="jad">
@@ -74,6 +74,15 @@
     <wtkobfuscate jadfile="${jadfile}" jarfile="${jarfile}"/>
   </target>
 
+  <target name='sign' description='Sign the jar and jad files with our code signing certificate'>
+    <wtksign keystore="${keystore.file}"
+             jarfile="${jarfile}"
+             jadfile="${jadfile}"
+             storepass="${keystore.pass}"
+             certpass="${code_signing_key.pass}"
+             certalias="${code_signing_cert.alias}"/>
+  </target>
+
   <target name='preverify'>
     <wtkpreverify jarfile="${jarfile}" jadfile="${jadfile}"/>
   </target>
@@ -94,6 +103,7 @@
 
   <target name='initialize' description='initialize target directories'>
     <mkdir dir="${project.build.outputDirectory}"/>
+    <mkdir dir="${keystore.dir}"/>
   </target>
 
   <!-- For *nix only -->

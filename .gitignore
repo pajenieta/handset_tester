@@ -5,6 +5,10 @@ target/
 # to configure environment-specific settings
 src/build/user.properties
 
+### Support storing a java keystore for jar/jad signing. We do
+# not want to check this in.
+src/build/keystore
+
 # Documentation
 src/site/sphinx/build/
 
