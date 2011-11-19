@@ -57,7 +57,10 @@
             vendor="${project.groupId}"
             version="${project.version}">
       <midlet name="${project.artifactId}" class="${project.mainClass}"/>
-      <attribute name="FOO" value="BAR" /> <!-- placeholder... update later when I actually have attribs -->
+
+      <!-- App configuration -->
+      <attribute name="LOG_LEVEL" value="${log.level}"/>
+
     </wtkjad>
   </target>
 
