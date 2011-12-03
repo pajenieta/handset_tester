@@ -10,11 +10,14 @@ import javax.microedition.lcdui.List;
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.midlet.MIDletStateChangeException;
 
+import org.edc.ht.event.CommandRegistry;
+import org.edc.ht.screens.FileSystemInfoScreen;
 import org.edc.ht.screens.OnSetCurrentEventObserver;
-import org.edc.ht.screens.PhoneSpecs;
+import org.edc.ht.screens.PermissionInfo;
+import org.edc.ht.screens.PhoneSpecsScreen;
 import org.edc.util.log.Logger;
 
-public class Main extends MIDlet implements CommandListener {
+public class HandsetTester extends MIDlet implements CommandListener {
 
     private static final String DIALOG_TITLE_ABOUT = "About";
     private Command exitCommand;
@@ -28,8 +31,10 @@ public class Main extends MIDlet implements CommandListener {
 
         Logger.init(getAppProperty("LOG_LEVEL"));
 
-        mainMenuCommand = new Command("Menu", Command.SCREEN, 1);
-        exitCommand = new Command("Exit", Command.EXIT, 0);
+        // mainMenuCommand = new Command("Menu", Command.SCREEN, 1);
+        // exitCommand = new Command("Exit", Command.EXIT, 0);
+        mainMenuCommand = CommandRegistry.mainMenu();
+        exitCommand = CommandRegistry.exit();
 
         about = new Alert(DIALOG_TITLE_ABOUT,
                 "Handset Tester -- a j2me MIDlet for testing handset capabilities and behavior",
@@ -39,14 +44,22 @@ public class Main extends MIDlet implements CommandListener {
         Display.getDisplay(this).setCurrent(mainMenu);
     }
 
+    private Display getDisplay() {
+        return Display.getDisplay(this);
+    }
+
     private void initMainMenu() {
         // TODO: add images to menu items
         mainMenu = new List("Handset Tester Main Menu", List.IMPLICIT);
         menuItems = new Displayable[] {
-                new PhoneSpecs(Display.getDisplay(this))
+                new PhoneSpecsScreen(getDisplay()),
+                new PermissionInfo(this),
+                new FileSystemInfoScreen(this, getDisplay())
         };
         for (int i = 0; i < menuItems.length; i++) {
-            menuItems[i].setCommandListener(this);
+            if (!(menuItems[i] instanceof CommandListener)) {
+                menuItems[i].setCommandListener(this);
+            }
             menuItems[i].addCommand(exitCommand);
             menuItems[i].addCommand(mainMenuCommand);
             mainMenu.append(menuItems[i].getTitle(), null);

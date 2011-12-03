@@ -10,8 +10,8 @@
     <equals arg1='${emulator}' arg2='nokias40' casesensitive='false' trim='true'/>
   </condition>
 
-  <condition property='user.properties.location' 
-            value='${env.HANDSET_TESTER_USER_PROPERTIES_FILE}' 
+  <condition property='user.properties.location'
+            value='${env.HANDSET_TESTER_USER_PROPERTIES_FILE}'
             else='${build.config.dir}/user.properties'>
     <isset property='env.HANDSET_TESTER_USER_PROPERTIES_FILE'/>
   </condition>
@@ -25,7 +25,6 @@
 
   <taskdef resource="antenna.properties" classpathref="antenna.jar.path"/>
 
-
   <!--
     Set the ${wtk.home} property based on the value of the ${emulator}
     property, and default it to ${wtk.home.sun} if emulator is undefined.
@@ -38,11 +37,17 @@
   </condition>
   <property name='wtk.home' value='${wtk.home.sun}'/>
 
+  <path id='project.classpath'>
+    <!-- <fileset file="${wtk.home}/lib/cldcapi10.jar"/> -->
+    <!-- <fileset file="${wtk.home}/lib/midpapi20.jar"/> -->
+    <fileset file="${wtk.home}/lib/jsr75.jar"/>
+  </path>
+
 
   <!-- ======= -->
   <!-- Targets -->
   <!-- ======= -->
-  <target name='package' depends='initialize, jad, compile, jar, obfuscate, preverify, sign' description='Build the project'/>
+  <target name='package' depends='initialize, compile, jad, jar, obfuscate, preverify, sign' description='Build the project'/>
   <target name='run' depends='package, run-midlet' description='Run the App'/>
 
   <target name="jad">
@@ -53,14 +58,15 @@
     -->
     <wtkjad jadfile="${jadfile}"
             jarfile="${jarfile}"
-            name="${project.artifactId}"
-            vendor="${project.groupId}"
+            name="${midlet.name}"
+            vendor="${vendor}"
             version="${project.version}">
-      <midlet name="${project.artifactId}" class="${project.mainClass}"/>
-
-      <!-- App configuration -->
-      <attribute name="LOG_LEVEL" value="${log.level}"/>
-
+        <midlet name="${midlet.name}"
+                class="${project.mainClass}"
+                icon="/img/phone.png"/>
+        <!-- App configuration -->
+<!--         <attribute name="LOG_LEVEL" value="${log.level}"/> -->
+        <attribute name="MIDlet-Permissions" value="${app.permissions}" if="app.permissions"/>
     </wtkjad>
   </target>
 
@@ -70,14 +76,18 @@
                 jarfile="${jarfile}"
                 obfuscate="false"
                 preverify="false">
+          <fileset dir="${project.build.resources}"/>
     </wtkpackage>
   </target>
 
   <target name='obfuscate' description='obfuscate and minify the output jar with proguard'>
-    <wtkobfuscate jadfile="${jadfile}" jarfile="${jarfile}"/>
+    <wtkobfuscate jadfile="${jadfile}"
+                  jarfile="${jarfile}"
+                  classpathref="project.classpath"/>
   </target>
 
-  <target name='sign' description='Sign the jar and jad files with our code signing certificate'>
+  <target name='sign' description='Sign the jar and jad files with our code signing certificate' if="${sign.app}">
+    <!-- <echo>Signing with: store pass: ${keystore.pass} / key pass: ${code_signing_key.pass}</echo> -->
     <wtksign keystore="${keystore.file}"
              jarfile="${jarfile}"
              jadfile="${jadfile}"
@@ -97,6 +107,7 @@
   <target name='compile' description='compile java sources'>
     <wtkbuild srcdir="${project.build.sourceDirectory}"
               destdir="${project.build.outputDirectory}"
+              classpathref="project.classpath"
               preverify="false"/>
   </target>
 
@@ -110,15 +121,15 @@
   </target>
 
   <!-- For *nix only -->
-  <target name='fix_wm_name' 
+  <target name='fix_wm_name'
     description='If you run a non-reparenting window manager with x11/xorg, run this target once per xorg session to fix irregular emulator GUI behavior'>
     <exec executable="wmname">
       <arg value="LG3D"/>
     </exec>
   </target>
 
-  <!-- 
-    Generate an eclipse project.  This will clobber your existing eclipse project. 
+  <!--
+    Generate an eclipse project.  This will clobber your existing eclipse project.
     So do not do this more than once if you have customized your eclipse project.
   -->
   <target name='eclipse:eclipse'>
@@ -143,12 +154,44 @@
   </target>
 
   <target name='list:emulators'
-    description='List all installed j2me emulators. For this to work, you must define a wtk.home.EMULATOR_NAME property'>
+          description='List all installed j2me emulators. For this to work, you must define a wtk.home.EMULATOR_NAME property'>
     <listEmulators/>
   </target>
 
   <target name='list:devices' description='List all devices available for the active emulator.'>
     <listDevices/>
+  </target>
+
+  <target name='list:permissions'
+          description='Print the list of permissions that will be included in the jad'>
+    <concat>
+      <propertyresource name='app.permissions'/>
+    </concat>
+  </target>
+
+  <target name='package:all' description='create packages for multiple platforms/variants'>
+
+    <!-- default package -->
+    <antcall target='package' inheritAll='true' inheritRefs='true'>
+      <param name='midlet.name' value='${project.artifactId}_signed'/>
+      <param name='sign.app' value='true'/>
+      <param name='jarfile' value='${project.build.directory}/${project.artifactId}_signed.jar'/>
+      <param name='jadfile' value='${project.build.directory}/${project.artifactId}_signed.jad'/>
+    </antcall>
+
+    <!-- generic unsigned package -->
+    <antcall target='package' inheritAll='true' inheritRefs='true'>
+      <param name='midlet.name' value='${project.artifactId}_unsigned'/>
+      <param name='sign.app' value='false'/>
+      <param name='app.permissions' value=''/>
+      <param name='jarfile' value='${project.build.directory}/${project.artifactId}_unsigned.jar'/>
+      <param name='jadfile' value='${project.build.directory}/${project.artifactId}_unsigned.jad'/>
+    </antcall>
+
+  </target>
+
+  <target name='run:variant' description='a convenience target to save keystrokes for running a particular build variant'>
+    <wtkrun jadfile='${project.build.directory}/${project.artifactId}_${variant}.jad' device='${device}' wait='${wtk.run.wait}'/>
   </target>
 
 </project>

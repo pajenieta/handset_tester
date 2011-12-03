@@ -2,10 +2,8 @@ package org.edc.ht.screens;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Vector;
 
 import javax.microedition.lcdui.Display;
-import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.StringItem;
 
 import org.edc.util.log.Logger;
@@ -15,9 +13,7 @@ import org.edc.util.log.Logger;
  * 
  * @author greg
  */
-public class PhoneSpecsScreen extends Form implements OnSetCurrentEventObserver {
-
-    Vector debugInfo;
+public class PhoneSpecsScreen extends AbstractInfoForm implements OnSetCurrentEventObserver {
 
     public PhoneSpecsScreen(Display display) {
         super("Phone Specs");
@@ -55,15 +51,8 @@ public class PhoneSpecsScreen extends Form implements OnSetCurrentEventObserver 
         return platform;
     }
 
-    private void addPhoneSystemProps() {
+    protected void addPhoneSystemProps() {
         printPropGroup("Basic Properties", getPropKeys());
-    }
-
-    private void printPropGroup(String groupName, String[] propKeys) {
-        append(new StringItem(groupName, ""));
-        for (int i = 0; i < propKeys.length; i++) {
-            append(propKeys[i], System.getProperty(propKeys[i]));
-        }
     }
 
     private void addFileSystemInfo() {
@@ -110,19 +99,6 @@ public class PhoneSpecsScreen extends Form implements OnSetCurrentEventObserver 
         append("COLOR_HIGHLIGHTED_BORDER", display.getColor(Display.COLOR_HIGHLIGHTED_BORDER));
     }
 
-    private void append(String key, int val) {
-        append(key, new Integer(val));
-    }
-
-    private void append(String key, Object val) {
-        append(new StringItem(key + "=", val == null ? "null" : val.toString()));
-        if (Logger.getLogger().isDebug()) {
-            if (debugInfo == null)
-                debugInfo = new Vector();
-            debugInfo.addElement(key + "=" + val);
-        }
-    }
-
     static final String getBestDimensions(Display display, int imageType) {
         int x = display.getBestImageWidth(imageType);
         int y = display.getBestImageHeight(imageType);
@@ -157,14 +133,6 @@ public class PhoneSpecsScreen extends Form implements OnSetCurrentEventObserver 
                 "com.samsung.imei",
                 "com.nokia.mid.imei"
         };
-    }
-
-    public void onSetCurrent() {
-        Logger logger = Logger.getLogger();
-        if (logger.isDebug()) {
-            for (int i = 0; i < debugInfo.size(); i++)
-                logger.log(this, Logger.DEBUG, debugInfo.elementAt(i).toString());
-        }
     }
 
 }

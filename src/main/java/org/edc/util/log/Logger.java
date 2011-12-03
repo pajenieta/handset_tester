@@ -34,6 +34,10 @@ public class Logger {
     public static Logger getLogger() {
         return instance;
     }
+    
+    public void debug(Object origin, String message) {
+        log(origin, DEBUG, message);
+    }
 
     public void log(Class origin, int level, String message) {
         if (level >= this.logLevel) {

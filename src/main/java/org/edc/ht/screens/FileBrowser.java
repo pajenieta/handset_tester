@@ -65,7 +65,7 @@ public class FileBrowser extends List implements CommandListener {
         FileConnection fc = null;
         try {
             Logger.getLogger().log(this, Logger.DEBUG, "Preparint to open url: " + url);
-            fc = (FileConnection) Connector.open(url);
+            fc = (FileConnection) Connector.open(url, Connector.READ);
             if (fc.isDirectory()) {
                 for (Enumeration e = fc.list(); e.hasMoreElements();) {
                     append((String) e.nextElement(), null);
