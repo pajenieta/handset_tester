@@ -22,6 +22,11 @@ install:
       directory or modify your custom user.properties file to point to the location
       of your antenna jar.
 
+**TODO**: 
+
+    - update build to use mvn ant plugin for antenna and proguard, and
+      update the docs.
+
 --------------------------------------
 Setting/Fixing the Path to Java in WTK
 --------------------------------------
