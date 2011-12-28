@@ -12,6 +12,9 @@ src/build/keystore*
 # Documentation
 src/site/sphinx/build/
 
+### Publicly-available, open-source build-dependencies
+lib
+
 ### General eclipse configuration files. These should be generated
 # and then customized in eclipse.
 .classpath
