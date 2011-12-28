@@ -5,6 +5,14 @@
   <property name="build.config.dir" value='src/build'/>
   <typedef file="${build.config.dir}/j2me.antlib.xml"/>
 
+  <condition property='user.properties.location'
+            value='${env.HANDSET_TESTER_USER_PROPERTIES_FILE}'
+            else='${build.config.dir}/user.properties'>
+    <isset property='env.HANDSET_TESTER_USER_PROPERTIES_FILE'/>
+  </condition>
+
+  <property file="${user.properties.location}"/>
+
   <condition property='has_all_deps'>
     <and>
       <available file='${antenna.jar}'/>
@@ -17,13 +25,6 @@
     <equals arg1='${emulator}' arg2='nokias40' casesensitive='false' trim='true'/>
   </condition>
 
-  <condition property='user.properties.location'
-            value='${env.HANDSET_TESTER_USER_PROPERTIES_FILE}'
-            else='${build.config.dir}/user.properties'>
-    <isset property='env.HANDSET_TESTER_USER_PROPERTIES_FILE'/>
-  </condition>
-
-  <property file="${user.properties.location}"/>
   <property file="${build.config.dir}/project.properties"/>
 
   <!--
@@ -116,7 +117,7 @@
   </target>
 
   <target name='sign' description='Sign the jar and jad files with our code signing certificate' if="${sign.app}" depends='resolve'>
-    <!-- <echo>Signing with: store pass: ${keystore.pass} / key pass: ${code_signing_key.pass}</echo> -->
+    <echo>Signing with: store pass: ${keystore.pass} / key pass: ${code_signing_key.pass}</echo>
     <wtksign keystore="${keystore.file}"
              jarfile="${jarfile}"
              jadfile="${jadfile}"

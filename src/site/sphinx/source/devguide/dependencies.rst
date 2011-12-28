@@ -14,18 +14,11 @@ install:
       3.0.x, this is only provided for Windows and Mac environments. Because
       the developers of this project primarily use GNU/linux, we standardized
       on version 2.5.2, for which there is a 32-bit linux version.
-    - **A 32-bit version of eclipse** - We've been developing with Eclipse IDE for
-      Java Developers Indigo (v 3.7.1).
     - **Apache Ant (version 1.8.X is fine)**
-    - `Antenna 1.2.1-beta for Ant <http://antenna.sourceforge.net/>`_. Download
-      the binary jar version and either copy or symlink this in your apache lib
-      directory or modify your custom user.properties file to point to the location
-      of your antenna jar.
-
-**TODO**: 
-
-    - update build to use mvn ant plugin for antenna and proguard, and
-      update the docs.
+    - **A 32-bit version of eclipse** *(optional)*- We've been developing with
+      Eclipse IDE for Java Developers Indigo (v 3.7.1). Of course, you can use
+      any other IDE or text editor. We provide some notes below on getting
+      eclipse set up for j2me development.
 
 --------------------------------------
 Setting/Fixing the Path to Java in WTK

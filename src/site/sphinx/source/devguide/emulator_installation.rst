@@ -4,6 +4,10 @@
 Installing Other Emulators
 ==========================
 
+You do not need to install any emulators other than the Sun WTK to build
+handset tester. However, you may wish to install other emulators to emulate
+the behavior of a specific manufacturer's hardware.
+
 ----------------
 Samsung J2ME SDK
 ----------------

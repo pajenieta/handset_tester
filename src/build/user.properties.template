@@ -2,8 +2,13 @@ emulator=sun
 wtk.home.sun=${user.home}/opt/j2me/sun/WTK2.5.2
 wtk.home.samsung=
 wtk.home.nokias40=
-antenna.jar=${user.home}/opt/javalib/antenna/antenna-bin-1.2.1-beta.jar
-wtk.proguard.home=${user.home}/opt/javalib/proguard/current
+
+### Set antenna.jar if you want to use a custom version of antenna
+# antenna.jar=${user.home}/opt/javalib/antenna/antenna-bin-1.2.1-beta.jar
+
+### Set wtk.proguard.home to override which version of proguard
+# is used for code obfuscation
+# wtk.proguard.home=${user.home}/opt/javalib/proguard/current
 
 ### The password (storepass) for the java keystore
 keystore.pass=

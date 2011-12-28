@@ -23,7 +23,7 @@ The build loads these custom user properties before the main
 ``project.properties`` configuration file. Because ant properties are immutable
 and take the value that is specified when they are first defined, you can 
 override any project property configured in ``project.properties`` in your
-custom properties file.
+custom ``user.properties`` file.
 
 There is a sample user.properties template file defined in::
 
@@ -37,10 +37,6 @@ These properties should be defined in your custom user properties file:
         - ``wtk.home.sun``: the location where you installed the Sun/Oracle WTK
         - ``wtk.home.samsung``: the location of your Samsung J2ME SDK
         - ``wtk.home.nokias40``: the location of your Nokia S40 SDK
-    - ``antenna.jar`` : this should be set to the path where you have the antenna
-      jar installed. This is optional if you copy or symlink the jar in your
-      ant lib directory (or otherwise ensure that it is included in ant's
-      runtime classpath)
 
 ---------------------------
 Notes on Ant Build Targets
@@ -50,6 +46,10 @@ As usual, running ``ant -p`` will print out descriptions of the most important
 build targets. Run ``ant props`` to print out all the properties that are used
 in your build. This can be useful to troubleshoot a misconfiguration in the
 location of your environment-specific properties file.
+
+To create packages (jar + jad files) for multiple build targets/variants, run::
+
+    ant package:all
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Basic Emulator Execution
@@ -65,7 +65,7 @@ To run the MIDLet without re-building, execute::
     ant run-midlet
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Properties that control emulator behavior
+Properties that Control Emulator Behavior
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 =============== =====================================================
@@ -75,9 +75,9 @@ Property        Description
 ``device``      the name of the device that will be emulated
 =============== =====================================================
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Other Build Targets and Examples
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Emulator Execution Examples
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Print the names of installed emulators::
 
@@ -90,6 +90,55 @@ List the devices available for, in this case, the ``samsung`` emulator::
 Run the MIDLet, emulating the ``SGH-E250`` device with the ``samsung`` emulator::
 
     ant -Ddevice=SGH-E250 -Demulator=samsung run-midlet
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Code Signing Properties
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+By default, the build will produce unsigned jar+jad files. If you wish to sign
+the jad with a code signing certificate, you should define these properties in
+your ``user.properties`` file:
+
+============================= ==========================================================
+Property                      Description
+============================= ==========================================================
+``sign.app``                  Defaults to *false*. Set to *true* if you want to build
+                              an signed jar.
+
+``keystore.file``             Set this to the filename of a java keystore that
+                              contains your code signing certificate.
+
+``code_signing_cert.alias``   Set this to the alias of the certificate in your java
+                              keystore (equivalent to the ``-alias`` parameter
+                              used by keytool).
+
+``code_signing_key.pass``     the password of the private key in your keystore
+                              (equivalent to the ``-keypass`` parameter used by
+                              keytool)
+
+``keystore.pass``             the password of your java keystore (equivalent to
+                              the ``-storepass`` parameter used by keytool)
+============================= ==========================================================
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Other Build Properties
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Here is a list of some other properties that you might want to customize in the
+build, either by defining the property in your custom ``user.properties``
+file or specifying it on the ant build command line with ``-Dprop=val``
+
+===================== ==========================================================
+Property              Description
+===================== ==========================================================
+``antenna.jar``       You can set this if you want to use an alternative
+                      version of antenna. By default, antenna is downloaded
+                      automatically using the maven ant plugin.
+
+``wtk.proguard.home`` You can set this if you want to use an alternative
+                      version of proguard. By default, proguard is downloaded
+                      automatically using the maven ant plugin.
+===================== ==========================================================
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Notes on Running the Emulator in \*nix
@@ -186,7 +235,6 @@ Here is a sample ``handset_tester.properties``::
     wtk.home.sun=E:/opt/j2me/wtk/WTK2.5.2_01
     wtk.home.samsung=E:/opt/j2me/samsung/samsung_sdk-1.1
     wtk.home.nokias40=E:/opt/j2me/nokia/S40_5th_Edition_SDK
-    antenna.jar=E:/opt/javalib/antenna/antenna-bin-1.2.1-beta.jar
 
 Now you should be able to navigate to ``/cygdrive/w`` and invoke a J2ME emulator with ant:
 
