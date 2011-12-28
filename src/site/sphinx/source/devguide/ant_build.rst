@@ -1,8 +1,8 @@
 .. _ant_build:
 
-===========================
-Building with Ant + Antenna
-===========================
+=================
+Building with Ant
+=================
 
 -----------------------------------------------
 Configuring environment-specific build settings
@@ -62,7 +62,7 @@ the basic ``sun`` wtk emulator, execute::
 
 To run the MIDLet without re-building, execute::
 
-    ant run-midlet
+    ant run:midlet
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Properties that Control Emulator Behavior
@@ -89,7 +89,7 @@ List the devices available for, in this case, the ``samsung`` emulator::
 
 Run the MIDLet, emulating the ``SGH-E250`` device with the ``samsung`` emulator::
 
-    ant -Ddevice=SGH-E250 -Demulator=samsung run-midlet
+    ant -Ddevice=SGH-E250 -Demulator=samsung run:midlet
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Code Signing Properties
@@ -241,6 +241,6 @@ Now you should be able to navigate to ``/cygdrive/w`` and invoke a J2ME emulator
 .. code-block:: bash
 
     cd /cygdrive/w
-    ant -Ddevice=SGH-E250 -Demulator=samsung run-midlet
+    ant -Ddevice=SGH-E250 -Demulator=samsung run:midlet
 
 
