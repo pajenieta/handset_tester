@@ -17,6 +17,7 @@
     <and>
       <available file='${antenna.jar}'/>
       <available file='${proguard.jar}'/>
+      <available file='${junit.jar}'/>
     </and>
   </condition>
 
@@ -43,6 +44,19 @@
     <pathelement path="${antenna.jar}"/>
     <pathelement path="${proguard.jar}"/>
     <fileset file="${wtk.home}/lib/jsr75.jar"/>
+  </path>
+
+  <path id='test.compile.classpath'>
+    <pathelement path="${project.classpath}"/>
+    <pathelement path="${project.build.outputDirectory}"/>
+    <fileset file="${junit.jar}"/>
+  </path>
+
+  <path id='test.run.classpath'>
+    <pathelement path="${project.classpath}"/>
+    <pathelement path="${project.build.outputDirectory}"/>
+    <pathelement path="${project.build.testOutputDirectory}"/>
+    <fileset file="${junit.jar}"/>
   </path>
 
   <condition property="windows">
@@ -141,12 +155,32 @@
               preverify="false"/>
   </target>
 
+  <!-- TODO: add other tests -->
+  <target name='test' description='run all tests' depends='test:junit'/>
+
+  <target name='test-compile' description='compile unit tests' depends='compile'>
+    <javac srcdir='${project.build.testSourceDirectory}'
+           destdir='${project.build.testOutputDirectory}'
+           classpathref='test.compile.classpath'/>
+  </target>
+
+  <target name='test:junit' description='unit tests' depends='test-compile'>
+    <junit>
+      <classpath refid="test.run.classpath" />
+      <formatter type="brief" usefile="false" />
+      <batchtest fork="yes">
+        <fileset dir="${project.build.testOutputDirectory}" includes="**/*Test.class"/>
+      </batchtest>
+    </junit>
+  </target>
+
   <target name='clean' description='delete the target directory, including compiled class, jar and jad files'>
     <delete dir="${project.build.directory}"/>
   </target>
 
   <target name='initialize' description='initialize target directories'>
     <mkdir dir="${project.build.outputDirectory}"/>
+    <mkdir dir="${project.build.testOutputDirectory}"/>
     <mkdir dir="${keystore.dir}"/>
     <mkdir dir="${lib.dir}"/>
 
@@ -271,6 +305,7 @@
     <dependencies filesetId="dependency.fileset" useScope="runtime">
       <dependency groupId="net.sf.antenna" artifactId="antenna" version="${antenna.version}"/>
       <dependency groupId="net.sf.proguard" artifactId="proguard" version="${proguard.version}"/>
+      <dependency groupId="junit" artifactId="junit" version="${junit.version}"/>
     </dependencies>
 
     <copy todir="${lib.dir}">
