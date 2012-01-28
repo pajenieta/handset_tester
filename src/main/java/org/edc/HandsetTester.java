@@ -2,19 +2,25 @@ package org.edc;
 
 import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
+import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
+import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.List;
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.midlet.MIDletStateChangeException;
 
 import org.edc.ht.event.CommandRegistry;
+import org.edc.ht.screens.CanvasFontScreen;
+import org.edc.ht.screens.CanvasScreen;
 import org.edc.ht.screens.FileSystemInfoScreen;
 import org.edc.ht.screens.OnSetCurrentEventObserver;
 import org.edc.ht.screens.PermissionInfo;
 import org.edc.ht.screens.PhoneSpecsScreen;
+import org.edc.ht.screens.HighlightEnabledTextAreaTestScreen;
+import org.edc.ht.screens.TextAreaTestScreen;
 import org.edc.util.log.Logger;
 
 public class HandsetTester extends MIDlet implements CommandListener {
@@ -50,18 +56,36 @@ public class HandsetTester extends MIDlet implements CommandListener {
 
     private void initMainMenu() {
         // TODO: add images to menu items
+        Font mediumFont = Font.getFont(Font.FACE_PROPORTIONAL, Font.STYLE_PLAIN, Font.SIZE_MEDIUM);
+
         mainMenu = new List("Handset Tester Main Menu", List.IMPLICIT);
         menuItems = new Displayable[] {
                 new PhoneSpecsScreen(getDisplay()),
                 new PermissionInfo(this),
-                new FileSystemInfoScreen(this, getDisplay())
+                new FileSystemInfoScreen(this, getDisplay()),
+                new CanvasFontScreen(this, mainMenu),
+                new CanvasScreen(this, mainMenu),
+                
+                new TextAreaTestScreen(
+                        this,
+                        mainMenu,
+                        "This is a test of our j2me TextArea widget, which should wrap. This should support several lines"
+                                + " of text and wrap properly.",
+                        mediumFont),
+
+                new HighlightEnabledTextAreaTestScreen(this, mainMenu,
+                        "This is a test of our j2me TextArea widget, which should wrap.",
+                        mediumFont)
         };
         for (int i = 0; i < menuItems.length; i++) {
-            if (!(menuItems[i] instanceof CommandListener)) {
+            if (!(menuItems[i] instanceof CommandListener) && !(menuItems[i] instanceof Canvas)) {
                 menuItems[i].setCommandListener(this);
             }
-            menuItems[i].addCommand(exitCommand);
-            menuItems[i].addCommand(mainMenuCommand);
+
+            if (!(menuItems[i] instanceof Canvas)) {
+                menuItems[i].addCommand(exitCommand);
+                menuItems[i].addCommand(mainMenuCommand);
+            }
             mainMenu.append(menuItems[i].getTitle(), null);
         }
 

@@ -145,7 +145,10 @@
   </target>
 
   <target name='run:midlet' depends='resolve'>
-    <wtkrun jadfile="${jadfile}" device='${device}' wait="${wtk.run.wait}"/>
+    <wtkrun jadfile="${jadfile}"
+            device='${device}'
+            heapsize='${emulator.heapsize}'
+            wait="${wtk.run.wait}"/>
   </target>
 
   <target name='compile' description='compile java sources' depends='initialize,resolve'>
@@ -161,7 +164,8 @@
   <target name='test-compile' description='compile unit tests' depends='compile'>
     <javac srcdir='${project.build.testSourceDirectory}'
            destdir='${project.build.testOutputDirectory}'
-           classpathref='test.compile.classpath'/>
+           classpathref='test.compile.classpath'
+           source='1.1'/>
   </target>
 
   <target name='test:junit' description='unit tests' depends='test-compile'>
