@@ -21,8 +21,7 @@
     </and>
   </condition>
 
-  <!-- nokia fix: the nokias40 emulator does not seem to properly accept device strings. -->
-  <condition property='device' value=''>
+  <condition property='device' value='S40_5th_Edition_SDK'>
     <equals arg1='${emulator}' arg2='nokias40' casesensitive='false' trim='true'/>
   </condition>
 
@@ -87,6 +86,10 @@
     </condition>
   </fail>
 
+  <condition property='include_wav_files'>
+    <istrue value='${include.wav.files.in.jar}'/>
+  </condition>
+
 
   <!-- ======= -->
   <!-- Targets -->
@@ -120,7 +123,9 @@
                 jarfile="${jarfile}"
                 obfuscate="false"
                 preverify="false">
-          <fileset dir="${project.build.resources}"/>
+          <fileset dir="${project.build.resources}">
+            <exclude name="audio/wav/**/*.wav" unless='${include_wav_files}'/>
+          </fileset>
     </wtkpackage>
   </target>
 
@@ -249,16 +254,9 @@
     </concat>
   </target>
 
-  <target name='package:all' description='create packages for multiple platforms/variants'>
+  <target name='package:all' description='create packages for multiple platforms/variants' depends='package:unsigned,package:signed'/>
 
-    <!-- default package -->
-    <antcall target='package' inheritAll='true' inheritRefs='true'>
-      <param name='midlet.name' value='${project.artifactId}_signed'/>
-      <param name='sign.app' value='true'/>
-      <param name='jarfile' value='${project.build.directory}/${project.artifactId}_signed.jar'/>
-      <param name='jadfile' value='${project.build.directory}/${project.artifactId}_signed.jad'/>
-    </antcall>
-
+  <target name='package:unsigned'>
     <!-- generic unsigned package -->
     <antcall target='package' inheritAll='true' inheritRefs='true'>
       <param name='midlet.name' value='${project.artifactId}_unsigned'/>
@@ -267,7 +265,15 @@
       <param name='jarfile' value='${project.build.directory}/${project.artifactId}_unsigned.jar'/>
       <param name='jadfile' value='${project.build.directory}/${project.artifactId}_unsigned.jad'/>
     </antcall>
+  </target>
 
+  <target name='package:signed'>
+    <antcall target='package' inheritAll='true' inheritRefs='true'>
+      <param name='midlet.name' value='${project.artifactId}_signed'/>
+      <param name='sign.app' value='true'/>
+      <param name='jarfile' value='${project.build.directory}/${project.artifactId}_signed.jar'/>
+      <param name='jadfile' value='${project.build.directory}/${project.artifactId}_signed.jad'/>
+    </antcall>
   </target>
 
   <target name='run:variant' description='a convenience target to save keystrokes for running a particular build variant'>
@@ -325,6 +331,55 @@
   </target>
   <target name='cp-proguard-windows' if='must_cp_proguard'>
     <copy tofile="${lib.dir}/proguard.jar" file="${lib.dir}/proguard-${proguard.version}.jar"/>
+  </target>
+
+  <target name='install' description='Install the jad+jar to a phone' if='enable.install'>
+
+    <echo>Deleting existing files</echo>
+    <exec executable="${gammu.bin}">
+      <arg value="-s"/>
+      <arg value="1"/>
+      <arg value="deletefiles"/>
+      <arg value="${inst.dir}/${midlet.name}.jar"/>
+    </exec>
+    <exec executable="${gammu.bin}">
+      <arg value="-s"/>
+      <arg value="1"/>
+      <arg value="deletefiles"/>
+      <arg value="${inst.dir}/${midlet.name}.jad"/>
+    </exec>
+
+    <echo>Installing new files</echo>
+    <exec executable="${gammu.bin}">
+      <arg value="-s"/>
+      <arg value="1"/>
+      <arg value="addfile"/>
+      <arg value="${inst.dir}"/>
+      <arg value="${project.build.directory}/${midlet.name}.jar"/>
+    </exec>
+    <exec executable="${gammu.bin}">
+      <arg value="-s"/>
+      <arg value="1"/>
+      <arg value="addfile"/>
+      <arg value="${inst.dir}"/>
+      <arg value="${project.build.directory}/${midlet.name}.jad"/>
+    </exec>
+  </target>
+
+  <target name='install:signed' description='install signed jar+jar to a phone'>
+    <antcall target='install' inheritAll='true' inheritRefs='true'>
+      <param name='enable.install' value='true'/>
+      <param name='midlet.name' value='${project.artifactId}_signed'/>
+      <param name='inst.dir' value='${inst.dir.signed}'/>
+    </antcall>
+  </target>
+
+  <target name='install:unsigned' description='install unsigned jar+jar to a phone'>
+    <antcall target='install' inheritAll='true' inheritRefs='true'>
+      <param name='enable.install' value='true'/>
+      <param name='midlet.name' value='${project.artifactId}_unsigned'/>
+      <param name='inst.dir' value='${inst.dir.unsigned}'/>
+    </antcall>
   </target>
 
 </project>

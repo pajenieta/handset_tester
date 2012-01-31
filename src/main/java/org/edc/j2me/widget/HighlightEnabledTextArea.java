@@ -8,15 +8,15 @@ import javax.microedition.lcdui.Graphics;
 
 public class HighlightEnabledTextArea extends TextArea {
 
-    protected Vector tokenCoordinates;
-    private int highlightedToken;
+    protected Vector tokens;
+    private int highlightedTokenIdx;
 
     public HighlightEnabledTextArea(String text, int width, Font font, int fontColor, int bgColor, Canvas canvas) {
         super(text, width, font, fontColor, bgColor, canvas);
     }
 
     protected void splitLines() {
-        tokenCoordinates = new Vector();
+        tokens = new Vector();
         super.splitLines();
     }
 
@@ -24,7 +24,7 @@ public class HighlightEnabledTextArea extends TextArea {
         prerender(g, x, y);
 
         // TODO: I must track screen y start position + marginTopPixels
-        TokenCoordinate tc = (TokenCoordinate) tokenCoordinates.elementAt(highlightedToken);
+        Token tc = (Token) tokens.elementAt(highlightedTokenIdx);
 
         for (int i = 0; i < getLineCount(); i++) {
             String line = getLine(i);
@@ -49,16 +49,16 @@ public class HighlightEnabledTextArea extends TextArea {
      */
 
     public int tokenCount() {
-        return tokenCoordinates.size();
+        return tokens.size();
     }
 
     protected void appendTokenCoordinates(String token, int tokenWidth) {
-        tokenCoordinates.addElement(new TokenCoordinate(lines.size() - 1, 0, token.length(), tokenWidth));
+        tokens.addElement(new Token(token, lines.size() - 1, 0, token.length(), tokenWidth));
     }
 
     protected void appendTokenCoordinates(StringBuffer sb, String token, int tokenWidth) {
         int startIdx = sb.length();
-        tokenCoordinates.addElement(new TokenCoordinate(lines.size(), startIdx, startIdx + token.length(), tokenWidth));
+        tokens.addElement(new Token(token, lines.size(), startIdx, startIdx + token.length(), tokenWidth));
     }
 
     // public int getHighlightedToken() {
@@ -66,16 +66,18 @@ public class HighlightEnabledTextArea extends TextArea {
     // }
 
     public void setHighlightedToken(int highlightedToken) {
-        this.highlightedToken = highlightedToken;
+        this.highlightedTokenIdx = highlightedToken;
     }
 
-    static class TokenCoordinate {
+    static class Token {
         final int lineIdx;
         final int startPos;
         final int endPos;
         final int tokenWidth;
+        final String text;
 
-        TokenCoordinate(int lineIdx, int startPos, int endPos, int tokenWidth) {
+        Token(String text, int lineIdx, int startPos, int endPos, int tokenWidth) {
+            this.text = text;
             this.lineIdx = lineIdx;
             this.startPos = startPos;
             this.endPos = endPos;
@@ -91,6 +93,10 @@ public class HighlightEnabledTextArea extends TextArea {
 
         g.fillRect(x, y, width, rectHeight);
         super.prerender(g, x, y);
+    }
+
+    public String getTokenText(int idx) {
+        return ((Token) tokens.elementAt(idx)).text;
     }
 
 }

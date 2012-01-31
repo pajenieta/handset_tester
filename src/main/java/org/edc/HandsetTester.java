@@ -16,6 +16,8 @@ import org.edc.ht.event.CommandRegistry;
 import org.edc.ht.screens.CanvasFontScreen;
 import org.edc.ht.screens.CanvasScreen;
 import org.edc.ht.screens.FileSystemInfoScreen;
+import org.edc.ht.screens.AudioSlide;
+import org.edc.ht.screens.LetterReaderScreen;
 import org.edc.ht.screens.OnSetCurrentEventObserver;
 import org.edc.ht.screens.PermissionInfo;
 import org.edc.ht.screens.PhoneSpecsScreen;
@@ -65,17 +67,19 @@ public class HandsetTester extends MIDlet implements CommandListener {
                 new FileSystemInfoScreen(this, getDisplay()),
                 new CanvasFontScreen(this, mainMenu),
                 new CanvasScreen(this, mainMenu),
-                
-                new TextAreaTestScreen(
-                        this,
-                        mainMenu,
-                        "This is a test of our j2me TextArea widget, which should wrap. This should support several lines"
-                                + " of text and wrap properly.",
+
+                new AudioSlide(this, mainMenu),
+
+                new TextAreaTestScreen(this, mainMenu,
+                        "This is a test of our j2me TextArea widget, which should wrap."
+                                + " This should support several lines of text and wrap properly.",
                         mediumFont),
 
                 new HighlightEnabledTextAreaTestScreen(this, mainMenu,
                         "This is a test of our j2me TextArea widget, which should wrap.",
-                        mediumFont)
+                        mediumFont),
+
+                new LetterReaderScreen(this, mainMenu, "a e i o u q r s t u v", mediumFont)
         };
         for (int i = 0; i < menuItems.length; i++) {
             if (!(menuItems[i] instanceof CommandListener) && !(menuItems[i] instanceof Canvas)) {

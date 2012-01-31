@@ -8,7 +8,7 @@ import javax.microedition.midlet.MIDlet;
 public class CanvasFontScreen extends AbstractCanvasScreen {
 
     public CanvasFontScreen(MIDlet midlet, Displayable mainMenu) {
-        super(midlet,mainMenu);
+        super(midlet, mainMenu);
         setTitle("Canvas Fonts");
     }
 
@@ -28,10 +28,10 @@ public class CanvasFontScreen extends AbstractCanvasScreen {
 
         println("Press 0 for Main Menu", g, font);
         println("Screen: " + width + "x" + height, g, font);
-        
+
         println("Fonts:", g, font);
-        int[] fontSizes = {Font.SIZE_LARGE, Font.SIZE_MEDIUM, Font.SIZE_SMALL};
-        for(int i=0; i<fontSizes.length;i++) {
+        int[] fontSizes = { Font.SIZE_LARGE, Font.SIZE_MEDIUM, Font.SIZE_SMALL };
+        for (int i = 0; i < fontSizes.length; i++) {
             font = getFontSize(fontSizes[i]);
             reportFontHeight(g, font);
             reportCharFit(g, font, width);
@@ -39,11 +39,18 @@ public class CanvasFontScreen extends AbstractCanvasScreen {
 
     }
 
+    /*
+     * On many variable width fonts that use a latin alphabet, "W" is the widest letter. In my
+     * tests, "X" has the same width in both the small and medium font sizes on a nokia C1-01, but W
+     * is progressively wider as the font size increases. Therefore, I use "W" to measure maximum
+     * possible font character width and the number of chars that can fit on a single line on a
+     * Canvas.
+     */
     private void reportCharFit(Graphics g, Font font, int width) {
-        int maxCharsPerLine = (width / font.stringWidth("X"));
-        println(fontSizeLabel(font) + " maxCharsPerLine: " + maxCharsPerLine, g, font);
+        int maxCharsPerLine = (int) ((float) width / (float) font.stringWidth("W"));
+        println(fontSizeLabel(font) + " W-chars: " + maxCharsPerLine, g, font);
     }
-    
+
     private void reportFontHeight(Graphics g, Font font) {
         println(fontSizeLabel(font) + " height: " + font.getHeight(), g, font);
     }
