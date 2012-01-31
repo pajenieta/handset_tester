@@ -26,11 +26,10 @@ public class HighlightEnabledTextAreaTestScreen extends AbstractFontResizableCan
         this.text = text;
         updateSlideContents();
     }
-    
+
     protected void paint(Graphics g) {
         clearScreen(g);
         printMenuIndicator(g, getUpdatedFont());
-        textArea.setHighlightedToken(highlightedTokenIdx);
         textArea.render(g, getWidthPercent(5), y);
         renderToolBar(g, ArrowButton.LEFT, CENTER_BUTTON, ArrowButton.RIGHT);
     }
@@ -48,8 +47,8 @@ public class HighlightEnabledTextAreaTestScreen extends AbstractFontResizableCan
                 if (highlightedTokenIdx >= tokenCount) {
                     cancel();
                 } else {
+                    textArea.setHighlightedToken(highlightedTokenIdx++);
                     repaint();
-                    highlightedTokenIdx++;
                 }
             }
         };

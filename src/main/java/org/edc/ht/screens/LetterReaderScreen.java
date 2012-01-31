@@ -21,10 +21,10 @@ public class LetterReaderScreen extends HighlightEnabledTextAreaTestScreen {
         audioPlayer = new ClasspathResourceAudioPlayer(100);
     }
 
-    private void playAudio() {
+    private void playAudio(int tokenIdx) {
         // TODO: figure out where to code case stuff (should be in audio player)
         // Also, audio player should maybe called TokenAudioReader or something like that.
-        String text = textArea.getTokenText(highlightedTokenIdx).toLowerCase();
+        String text = textArea.getTokenText(tokenIdx).toLowerCase();
         audioPlayer.playAudio(AudioClipType.LETTER, text);
     }
 
@@ -37,8 +37,9 @@ public class LetterReaderScreen extends HighlightEnabledTextAreaTestScreen {
                 if (highlightedTokenIdx >= tokenCount) {
                     cancel();
                 } else {
+                    textArea.setHighlightedToken(highlightedTokenIdx);
                     repaint();
-                    playAudio();
+                    playAudio(highlightedTokenIdx);
                     highlightedTokenIdx++;
                 }
             }
